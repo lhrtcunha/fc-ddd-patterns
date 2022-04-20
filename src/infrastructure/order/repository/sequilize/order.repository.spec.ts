@@ -82,7 +82,6 @@ describe("Order repository test", () => {
     });
   });
 
-
   it("should update order", async () => {
     const customerRepository = new CustomerRepository();
     const customer = new Customer("123", "Customer 1");
