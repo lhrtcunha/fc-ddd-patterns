@@ -1,3 +1,4 @@
+import { removeTicks } from "sequelize/types/utils";
 import OrderItem from "./order_item";
 export default class Order {
   private _id: string;
@@ -21,8 +22,17 @@ export default class Order {
     return this._customerId;
   }
 
+  changeCustomerId(customerId: string) {
+    this._customerId = customerId;
+    this.validate();
+  }
+
   get items(): OrderItem[] {
     return this._items;
+  }
+
+  addItem(item: OrderItem){
+    return this._items.push(item);
   }
 
   validate(): boolean {

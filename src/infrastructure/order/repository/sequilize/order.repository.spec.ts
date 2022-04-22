@@ -104,21 +104,28 @@ describe("Order repository test", () => {
       2
     );
 
-    const order = new Order("123", "123", [ordemItem]);
-
+    const order = new Order("123", customer.id, [ordemItem]);
     const orderRepository = new OrderRepository();
     await orderRepository.create(order);
 
-    let orderSaved = await orderRepository.find(order.id);
-    
+    const updateOrder = await orderRepository.find(order.id);
+    expect(updateOrder.items).toHaveLength(1);
 
-    expect(orderSaved.items).toHaveLength(1);
+    const ordemItem2 = new OrderItem(
+      "2",
+      product.name,
+      product.price,
+      product.id,
+      1
+    );    
 
-    const updateOrder = new Order(orderSaved.id, customer2.id, [ordemItem]);
+    updateOrder.addItem(ordemItem2);
     await orderRepository.update(updateOrder);
+    expect(updateOrder.items).toHaveLength(2);    
 
-    orderSaved = await orderRepository.find(updateOrder.id);
-    expect(orderSaved.customerId).toEqual(customer2.id);
+    updateOrder.changeCustomerId(customer2.id);
+    await orderRepository.update(updateOrder);
+    expect(updateOrder.customerId).toEqual(customer2.id);
   });
 
   it("should find a order by ID", async () => {
