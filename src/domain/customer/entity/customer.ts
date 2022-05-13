@@ -1,3 +1,8 @@
+import EventDispatcher from "../../@shared/event/event-dispatcher";
+import CustomerAddressChangedEvent from "../event/customer-address-changed.event";
+import SendConsoleLogWhenCustomerAddressIsChangedHandler from "../event/handler/send-consoleLog-when-customer-address-is-changed.handler";
+import SendConsoleLog1WhenCustomerIsCreatedHandler from "../event/handler/send-consoleLog1-when-customer-is-created.handler";
+import SendConsoleLog2WhenCustomerIsCreatedHandler from "../event/handler/send-consoleLog2-when-customer-is-created.handler";
 import Address from "../value-object/address";
 
 export default class Customer {
@@ -6,11 +11,18 @@ export default class Customer {
   private _address!: Address;
   private _active: boolean = false;
   private _rewardPoints: number = 0;
+  private _eventDispatcher = new EventDispatcher();
+
 
   constructor(id: string, name: string) {
     this._id = id;
     this._name = name;
     this.validate();
+
+    const eventHandler1: SendConsoleLog1WhenCustomerIsCreatedHandler = new SendConsoleLog1WhenCustomerIsCreatedHandler();
+    const eventHandler2: SendConsoleLog2WhenCustomerIsCreatedHandler = new SendConsoleLog2WhenCustomerIsCreatedHandler();
+    this._eventDispatcher.register("CustomerCreatedEvent", eventHandler1);
+    this._eventDispatcher.register("CustomerCreatedEvent", eventHandler2);    
   }
 
   get id(): string {
@@ -24,6 +36,10 @@ export default class Customer {
   get rewardPoints(): number {
     return this._rewardPoints;
   }
+
+  get eventDispatcher(): EventDispatcher {
+    return this._eventDispatcher;
+  }  
 
   validate() {
     if (this._id.length === 0) {
@@ -45,6 +61,9 @@ export default class Customer {
   
   changeAddress(address: Address) {
     this._address = address;
+
+    const customerAddressChanged = new SendConsoleLogWhenCustomerAddressIsChangedHandler()
+    this._eventDispatcher.register("CustomerAddressChangedEvent", customerAddressChanged);  
   }
 
   isActive(): boolean {
