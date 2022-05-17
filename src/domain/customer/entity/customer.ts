@@ -19,10 +19,9 @@ export default class Customer {
     this._name = name;
     this.validate();
 
-    const eventHandler1: SendConsoleLog1WhenCustomerIsCreatedHandler = new SendConsoleLog1WhenCustomerIsCreatedHandler();
-    const eventHandler2: SendConsoleLog2WhenCustomerIsCreatedHandler = new SendConsoleLog2WhenCustomerIsCreatedHandler();
-    this._eventDispatcher.register("CustomerCreatedEvent", eventHandler1);
-    this._eventDispatcher.register("CustomerCreatedEvent", eventHandler2);    
+    this._eventDispatcher.register("CustomerCreatedEvent", new SendConsoleLog1WhenCustomerIsCreatedHandler());
+    this._eventDispatcher.register("CustomerCreatedEvent", new SendConsoleLog2WhenCustomerIsCreatedHandler());
+    this._eventDispatcher.register("CustomerAddressChangedEvent", new SendConsoleLogWhenCustomerAddressIsChangedHandler());  
   }
 
   get id(): string {
@@ -61,9 +60,7 @@ export default class Customer {
   
   changeAddress(address: Address) {
     this._address = address;
-
-    const customerAddressChanged = new SendConsoleLogWhenCustomerAddressIsChangedHandler()
-    this._eventDispatcher.register("CustomerAddressChangedEvent", customerAddressChanged);  
+    this._eventDispatcher.notify(new CustomerAddressChangedEvent(this));
   }
 
   isActive(): boolean {
